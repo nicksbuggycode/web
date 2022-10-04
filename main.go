@@ -3,36 +3,43 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func executeTemplate(w http.ResponseWriter, filepath string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tpl, err := template.ParseFiles("templates/home.gohtml")
-	if err != nil{
-		panic(err) // TODO: remove the panic
+	tpl, err := template.ParseFiles(filepath)
+	if err != nil {
+		log.Printf("parsing template: %v", err)
+		http.Error(w, "Error parsing the template", http.StatusInternalServerError)
+		return
 	}
 	err = tpl.Execute(w, nil)
-	if err != nil{
-		panic(err) // TODO: remove the panic
+	if err != nil {
+		log.Printf("Error Executing template: %v", err)
+		http.Error(w, "Error executing the template", http.StatusInternalServerError)
+		return
 	}
+
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	tplPath := filepath.Join("templates", "home.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to my FAQ woooooo</h1>")
+	tplPath := filepath.Join("templates", "faq.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email</p>")
-
-}
-
-type User struct {
-	Name string
+	tplPath := filepath.Join("templates", "contact.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func main() {
