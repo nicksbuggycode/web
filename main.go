@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -9,7 +10,14 @@ import (
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to my site</h1>")
+	tpl, err := template.ParseFiles("templates/home.gohtml")
+	if err != nil{
+		panic(err) // TODO: remove the panic
+	}
+	err = tpl.Execute(w, nil)
+	if err != nil{
+		panic(err) // TODO: remove the panic
+	}
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +29,10 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email</p>")
 
+}
+
+type User struct {
+	Name string
 }
 
 func main() {
